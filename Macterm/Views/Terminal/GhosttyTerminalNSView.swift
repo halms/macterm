@@ -15,6 +15,18 @@ final class GhosttyTerminalNSView: NSView {
     /// the terminal should always be terminal input, never a window drag.
     override var mouseDownCanMoveWindow: Bool { false }
 
+    // MARK: - Accessibility
+
+    /// Expose the focused terminal as an editable text target to accessibility
+    /// clients such as VoiceOver and dictation tools, matching Ghostty.app.
+    override func isAccessibilityElement() -> Bool {
+        true
+    }
+
+    override func accessibilityRole() -> NSAccessibility.Role? {
+        .textArea
+    }
+
     /// Weak registry of every live instance so global operations (e.g. config
     /// reload) can iterate without a central cache.
     @MainActor private static let liveViews = NSHashTable<GhosttyTerminalNSView>.weakObjects()

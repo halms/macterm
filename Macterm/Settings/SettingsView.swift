@@ -475,7 +475,7 @@ private struct GeneralSettings: View {
             Section("Ghostty Config") {
                 HStack {
                     TextField(
-                        "Path", text: $ghosttyConfigPath, prompt: Text("~/.config/ghostty/config")
+                        "Path", text: $ghosttyConfigPath, prompt: Text("~/.config/ghostty/config.ghostty")
                     )
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { commitPath() }

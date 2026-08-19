@@ -397,6 +397,20 @@ final class Preferences {
         return (userGhosttyConfigPath as NSString).expandingTildeInPath
     }
 
+    /// Ghostty renamed its XDG config from `config` to `config.ghostty` in
+    /// 1.2.3. Prefer the current name, but keep an existing legacy config
+    /// working for users who have not renamed it yet. When neither exists,
+    /// choose the current name so Open Config creates the canonical file.
+    static func defaultUserGhosttyConfigPath(
+        fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
+    ) -> String {
+        let current = "~/.config/ghostty/config.ghostty"
+        let legacy = "~/.config/ghostty/config"
+        let currentPath = (current as NSString).expandingTildeInPath
+        let legacyPath = (legacy as NSString).expandingTildeInPath
+        return fileExists(currentPath) || !fileExists(legacyPath) ? current : legacy
+    }
+
     /// Programs a passthrough-flagged keybind yields to, as the user typed them
     /// (`nvim, hx`). Stored raw so the Settings field round-trips their spacing
     /// verbatim; `KeybindPassthrough.programNames` does the parsing and is the
@@ -550,7 +564,8 @@ final class Preferences {
             .flatMap(WindowGlassStyle.init(rawValue:)) ?? .regular
         adaptiveTerminalChromeEnabled = defaults.object(forKey: Keys.adaptiveTerminalChromeEnabled) as? Bool ?? false
         hideTitleBar = defaults.object(forKey: Keys.hideTitleBar) as? Bool ?? false
-        userGhosttyConfigPath = defaults.string(forKey: Keys.userGhosttyConfigPath) ?? "~/.config/ghostty/config"
+        userGhosttyConfigPath = defaults.string(forKey: Keys.userGhosttyConfigPath)
+            ?? Self.defaultUserGhosttyConfigPath()
         passthroughPrograms = defaults.string(forKey: Keys.passthroughPrograms) ?? ""
         quickTerminalWidthFraction = Self.clampFraction(defaults.double(forKey: Keys.quickTerminalWidth), fallback: 0.6)
         quickTerminalHeightFraction = Self.clampFraction(defaults.double(forKey: Keys.quickTerminalHeight), fallback: 0.5)

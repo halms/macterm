@@ -65,4 +65,14 @@ struct PreferencesTests {
         #expect(Preferences.clampSidebarWidth(range.upperBound + 40) == range.upperBound)
         #expect(Preferences.clampSidebarWidth(213.5) == 213.5)
     }
+
+    @Test
+    func default_ghostty_config_path_prefers_the_current_name_with_legacy_fallback() {
+        let current = "~/.config/ghostty/config.ghostty"
+        let legacy = "~/.config/ghostty/config"
+
+        #expect(Preferences.defaultUserGhosttyConfigPath { $0.hasSuffix("config.ghostty") } == current)
+        #expect(Preferences.defaultUserGhosttyConfigPath { $0.hasSuffix("/config") } == legacy)
+        #expect(Preferences.defaultUserGhosttyConfigPath { _ in false } == current)
+    }
 }

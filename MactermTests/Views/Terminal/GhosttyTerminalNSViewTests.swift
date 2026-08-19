@@ -3,10 +3,21 @@ import GhosttyKit
 @testable import Macterm
 import Testing
 
-/// Covers the pure libghostty-enum mappings on the terminal NSView. The view
-/// itself (surface lifecycle, rendering) is deliberately not unit-tested.
+/// Covers the terminal NSView contracts that do not require a live surface.
 @MainActor
 struct GhosttyTerminalNSViewTests {
+    @Test
+    func terminalSurface_isAnAccessibleEditableTextArea() {
+        let view = GhosttyTerminalNSView(
+            paneID: UUID(),
+            workingDirectory: "/tmp",
+            sessionName: "accessibility-test"
+        )
+
+        #expect(view.isAccessibilityElement())
+        #expect(view.accessibilityRole() == .textArea)
+    }
+
     @Test
     func cursorMapping_coversTheShapesGhosttyEmits() {
         // The shapes the core actually sends over a terminal: text grid,
